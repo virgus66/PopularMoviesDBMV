@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">PopularMoviesDBMV</string>
+
+    <string name="error_need_internet">You have no connection with internet</string>
 </resources>

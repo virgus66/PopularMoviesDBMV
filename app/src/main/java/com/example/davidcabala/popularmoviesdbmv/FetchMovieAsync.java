@@ -8,16 +8,17 @@ import com.example.davidcabala.popularmoviesdbmv.utilities.NetworkUtilities;
 
 import java.net.URL;
 
-public class FetchMovieAsync extends AsyncTask<String, Void, String[]>{
+public class FetchMovieAsync extends AsyncTask<String, Void, String>{
 
     private final String mApiKey;
+    private String respond;
 
     public FetchMovieAsync(String apiKey) {
         mApiKey = apiKey;
     }
 
     @Override
-    protected String[] doInBackground(String[] objects) {
+    protected String doInBackground(String... params) {
 //        if (objects.length == 0) {
 //            return null;
 //        }
@@ -38,7 +39,7 @@ public class FetchMovieAsync extends AsyncTask<String, Void, String[]>{
 //            return simpleJsonMovieData;
 
             Log.v("---------JSON--------", jsonMovieResponse);
-            return null;
+            return jsonMovieResponse;
 
         } catch (Exception e) {
             e.printStackTrace();
