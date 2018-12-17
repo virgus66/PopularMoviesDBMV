@@ -4,7 +4,7 @@ package com.example.davidcabala.popularmoviesdbmv;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.example.davidcabala.popularmovies1dc.utilities.NetworkUtilities;
+import com.example.davidcabala.popularmoviesdbmv.utilities.NetworkUtilities;
 
 import java.net.URL;
 
