@@ -9,5 +9,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+        new FetchMovieAsync("6b6d667ed3e438074ddf460ffe25a8ca").execute();
     }
 }
