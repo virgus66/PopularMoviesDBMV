@@ -11,27 +11,56 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.davidcabala.popularmoviesdbmv.utilities.MovieJsonUtility;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements FetchMovieAsync.AsyncResponse {
 
     private Menu mMenu;
+    private int currPage;
+    private String sortBy;
+    private String gsortOrder;
+
+    TextView tvJSON;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        tvJSON = findViewById(R.id.json);
+        currPage  = 2;
+        sortBy    = "vote_average";
+        gsortOrder = "desc";
+
+        updateMovies();
+    }
+
+    public void updateMovies() {
         if (isNetworkAvailable()) {
-            new FetchMovieAsync("6b6d667ed3e438074ddf460ffe25a8ca").execute();
+            String endpoint = "/discover/movie";
+//            String endpoint = "/movie/top_rated";
+//            String endpoint2 = "/movie/popular";
 
+            FetchMovieAsync async = new FetchMovieAsync();
+            async.delegate = this;
 
+            async.execute(endpoint, sortBy+"."+gsortOrder, String.valueOf(currPage+53));
 
         } else {
             Toast.makeText(this, getString(R.string.error_need_internet), Toast.LENGTH_LONG).show();
         }
+    }
+
+    @Override
+    public void processFinish(String json) {
+        Log.v("---------JSON-4--------", json);
+
+        tvJSON.setText(json);
+
+        new MovieJsonUtility().parseMoviesJson(json);
     }
 
     @Override
@@ -42,6 +71,14 @@ public class MainActivity extends AppCompatActivity {
         mMenu = menu;
 
         // Add menu items
+        mMenu.add(Menu.NONE,
+                3,
+                Menu.NONE,
+                null)
+                .setVisible(true)
+                .setIcon(R.mipmap.ic_launcher_foreground)
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+
         mMenu.add(Menu.NONE, // No group
                 1, // ID
                 Menu.NONE, // Sort order: not relevant
@@ -50,15 +87,17 @@ public class MainActivity extends AppCompatActivity {
                 .setIcon(R.mipmap.tesla)
                 .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
-        // Same settings as the one above
-        mMenu.add(Menu.NONE, 2, Menu.NONE, null)
+        mMenu.add(Menu.NONE,
+                2,
+                Menu.NONE,
+                null)
                 .setVisible(false)
                 .setIcon(R.mipmap.ic_launcher)
                 .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
+
         // Update menu to show relevant items
         updateMenu();
-
         return true;
     }
 
@@ -66,14 +105,28 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case 1:
-                updateSharedPrefs("SORT_POPULARITY_DESC");
+                updateSharedPrefs("","asc");
                 updateMenu();
                 //getMoviesFromTMDb(getSortMethod());
+                gsortOrder = "asc";
+                updateMovies();
                 return true;
             case 2:
-                updateSharedPrefs("SORT_VOTE_DESC");
+                updateSharedPrefs("","desc");
                 updateMenu();
                 //getMoviesFromTMDb(getSortMethod());
+                gsortOrder = "desc";
+                updateMovies();
+                return true;
+            case 3:
+                if (sortBy.equals("vote_average")) {
+                    sortBy = "popularity";
+                } else sortBy = "vote_average";
+
+                updateSharedPrefs(sortBy, gsortOrder);
+                updateMenu();
+                //getMoviesFromTMDb(getSortMethod());
+                updateMovies();
                 return true;
             default:
         }
@@ -82,10 +135,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateMenu() {
-        String sortMethod = getSortMethod();
-        Log.d("------SORT_METHOD------", sortMethod);
+        String sortOrder = getSortOrder();
+        Log.d("------SORT_ORDER------", sortOrder);
 
-        if (sortMethod.equals("SORT_POPULARITY_DESC")) {
+        if (sortOrder.equals("asc")) {
             mMenu.findItem(1).setVisible(false);
             mMenu.findItem(2).setVisible(true);
         } else {
@@ -94,17 +147,25 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private String getSortMethod() {
+    private String getSortOrder() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-        return prefs.getString("SORT_METHOD",
-                "SORT_POPULARITY_DESC");
+        return prefs.getString("SORT_ORDER",
+                "desc");
     }
 
-    private void updateSharedPrefs(String sortMethod) {
+    private String getSortBy() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        return prefs.getString("SORT_BY",
+                "desc");
+    }
+
+    private void updateSharedPrefs(String sortBy, String sortOrder) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString("SORT_METHOD", sortMethod);
+        editor.putString("SORT_BY", sortBy);
+        editor.putString("SORT_ORDER", sortOrder);
         editor.apply();
     }
 
@@ -116,4 +177,5 @@ public class MainActivity extends AppCompatActivity {
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
 
     }
+
 }

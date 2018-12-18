@@ -1,49 +1,66 @@
 package com.example.davidcabala.popularmoviesdbmv;
 
 
+import android.app.Activity;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.example.davidcabala.popularmoviesdbmv.utilities.MovieJsonUtility;
 import com.example.davidcabala.popularmoviesdbmv.utilities.NetworkUtilities;
 
 import java.net.URL;
+import java.util.Arrays;
 
 public class FetchMovieAsync extends AsyncTask<String, Void, String>{
 
-    private final String mApiKey;
-    private String respond;
+    private String mEndpoint;
+    public AsyncResponse delegate = null;
 
-    public FetchMovieAsync(String apiKey) {
-        mApiKey = apiKey;
+
+
+    // create interface to catch data in MainActivity
+    public interface AsyncResponse {
+        void processFinish(String output);
+    }
+
+
+
+    public FetchMovieAsync() {
+        super();
     }
 
     @Override
     protected String doInBackground(String... params) {
-//        if (objects.length == 0) {
-//            return null;
-//        }
-
-        String endpoint = "/movie/top_rated";
-
-        URL movieRequestUrl = NetworkUtilities.buildUrl(endpoint, mApiKey);
-
+        URL movieRequestUrl = NetworkUtilities.buildUrl(params[0], params[1], params[2]);
 
         try {
             Log.d("-----------URL---------", movieRequestUrl.toString());
             String jsonMovieResponse = NetworkUtilities
                     .getResponseFromHttpUrl(movieRequestUrl);
 
+
 //            String[] simpleJsonMovieData = OpenWeatherJsonUtils
 //                    .getSimpleWeatherStringsFromJson(MainActivity.this, jsonMovieResponse);
-//
 //            return simpleJsonMovieData;
 
-            Log.v("---------JSON--------", jsonMovieResponse);
+
             return jsonMovieResponse;
 
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
+    }
+
+    @Override
+    protected void onProgressUpdate(Void... values) {
+        super.onProgressUpdate(values);
+    }
+
+    @Override
+    protected void onPostExecute(String s) {
+        //Log.v("---------JSON-2--------", s);
+        delegate.processFinish(s);
     }
 }
