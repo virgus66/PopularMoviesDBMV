@@ -44,18 +44,18 @@ public class MovieJsonUtility {
 
                 movies[i] = new Movie(id,title,vote_count,video,vote_average,popularity,poster_path,original_lan,original_tit,overview,release_date);
 
-//                Log.d("--------- JSON --------",
-//                            movies[i].getVoteCount()   +" - "
-//                                + movies[i].getId()          +" - "
-//                                + movies[i].getVideo()       +" - "
-//                                + movies[i].getVoteAverage() +" - "
-//                                + movies[i].getTitle()       +" - "
-//                                + movies[i].getPopularity()  +" - "
-//                                + movies[i].getPosterPath()  +" - "
-//                                + movies[i].getOriginalLan() +" - "
-//                                + movies[i].getOriginalTit() +" - "
-//                                + movies[i].getOverview()    +" - "
-//                                + movies[i].getReleaseDate());
+                Log.d("--------- JSON --------",
+                            movies[i].getVoteCount()   +" - "
+                                + movies[i].getId()          +" - "
+                                + movies[i].getVideo()       +" - "
+                                + movies[i].getVoteAverage() +" - "
+                                + movies[i].getTitle()       +" - "
+                                + movies[i].getPopularity()  +" - "
+                                + movies[i].getPosterPath()  +" - "
+                                + movies[i].getOriginalLan() +" - "
+                                + movies[i].getOriginalTit() +" - "
+                                + movies[i].getOverview()    +" - "
+                                + movies[i].getReleaseDate());
             }
 
             return movies;
