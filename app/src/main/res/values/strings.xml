@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">Popular Movies</string>
 
-    <string name="error_need_internet">You have no connection with internet</string>
+    <string name="error_need_internet">You have no connection with internet.</string>
+
+    <string name="TMDB_POSTER_BASE">https://image.tmdb.org/t/p/w185</string>
 </resources>

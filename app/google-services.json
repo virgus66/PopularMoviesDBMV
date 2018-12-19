@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "1012576665971",
+    "firebase_url": "https://newsletter-ebd40.firebaseio.com",
+    "project_id": "newsletter-ebd40",
+    "storage_bucket": "newsletter-ebd40.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1012576665971:android:bcb176c22fb4a8c8",
+        "android_client_info": {
+          "package_name": "com.example.davidcabala.popularmoviesdbmv"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1012576665971-4eol77girl6jgqtdl0gdd9veag9049d4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD0ACh9tvX8XxsCeeZIkYfCP5hkoTlfZpk"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

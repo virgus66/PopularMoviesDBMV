@@ -8,15 +8,24 @@ import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
 import com.example.davidcabala.popularmoviesdbmv.utilities.MovieJsonUtility;
 
 public class MainActivity extends AppCompatActivity implements FetchMovieAsync.AsyncResponse {
+
+    private RecyclerView mRecyclerView;
+    private MoviesAdapter mMoviesAdapter;
 
     private Menu mMenu;
     private int currPage;
@@ -30,12 +39,31 @@ public class MainActivity extends AppCompatActivity implements FetchMovieAsync.A
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mRecyclerView= (RecyclerView) findViewById(R.id.movies_recycler_view);
+
         tvJSON = findViewById(R.id.json);
         currPage  = 2;
         sortBy    = "vote_average";
         gsortOrder = "desc";
 
+
+        mRecyclerView.setHasFixedSize(true);
+        LinearLayoutManager layoutManager
+                = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        mRecyclerView.setLayoutManager(layoutManager);
+
         updateMovies();
+
+//        Button crashButton = new Button(this);
+//        crashButton.setText("Crash!");
+//        crashButton.setOnClickListener(new View.OnClickListener() {
+//            public void onClick(View view) {
+//                Crashlytics.getInstance().crash(); // Force a crash
+//            }
+//        });
+//        addContentView(crashButton, new ViewGroup.LayoutParams(
+//                ViewGroup.LayoutParams.MATCH_PARENT,
+//                ViewGroup.LayoutParams.WRAP_CONTENT));
     }
 
     public void updateMovies() {
@@ -50,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements FetchMovieAsync.A
             async.execute(endpoint, sortBy+"."+gsortOrder, String.valueOf(currPage+53));
 
         } else {
-            Toast.makeText(this, getString(R.string.error_need_internet), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.error_need_internet, Toast.LENGTH_LONG).show();
         }
     }
 
@@ -58,9 +86,29 @@ public class MainActivity extends AppCompatActivity implements FetchMovieAsync.A
     public void processFinish(String json) {
         Log.v("---------JSON-4--------", json);
 
-        tvJSON.setText(json);
+        tvJSON.setText("");
 
-        new MovieJsonUtility().parseMoviesJson(json);
+        Movie[] movies = new MovieJsonUtility().parseMoviesJson(json);
+
+        for (Movie m : movies) {
+            String s =
+                              m.getVoteCount()   + "\n"
+                            + m.getId()          + "\n"
+                            + m.getVideo()       + "\n"
+                            + m.getVoteAverage() + "\n"
+                            + m.getTitle()       + "\n"
+                            + m.getPopularity()  + "\n"
+                            + m.getPosterPath()  + "\n"
+                            + m.getOriginalLan() + "\n"
+                            + m.getOriginalTit() + "\n"
+                            + m.getOverview()    + "\n"
+                            + m.getReleaseDate() +"\n\n";
+            tvJSON.append(s);
+        }
+
+
+        mMoviesAdapter = new MoviesAdapter(movies);
+        mRecyclerView.setAdapter(mMoviesAdapter);
     }
 
     @Override

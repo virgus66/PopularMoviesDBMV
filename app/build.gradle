@@ -1,5 +1,7 @@
 apply plugin: 'com.android.application'
 
+apply plugin: 'io.fabric'
+
 android {
     compileSdkVersion 27
     defaultConfig {
@@ -25,4 +27,20 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+
+    //firebase craslytics
+    implementation 'com.google.firebase:firebase-core:16.0.1'
+    // Check for v11.4.2 or higher
+    implementation 'com.google.firebase:firebase-core:16.0.6'
+    // Add dependency
+    implementation 'com.crashlytics.sdk.android:crashlytics:2.9.7'
+
+    //recyclerview
+    implementation 'com.android.support:recyclerview-v7:27.1.1'
+
+    //picasso
+    implementation 'com.squareup.picasso:picasso:2.71828'
 }
+
+//firebase crashlytic
+apply plugin: 'com.google.gms.google-services'
