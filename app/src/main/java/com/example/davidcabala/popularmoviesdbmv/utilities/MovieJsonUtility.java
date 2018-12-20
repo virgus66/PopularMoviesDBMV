@@ -21,7 +21,7 @@ public class MovieJsonUtility {
             JSONArray resultsArr = root.getJSONArray("results");
 
 
-            Log.d("-------- LENGTH -------", resultsArr.length()+"");
+            Log.d("------- JSON LNG ------", resultsArr.length()+"");
             Movie[] movies = new Movie[ resultsArr.length() ];
             //List<Movie> movies = new ArrayList<Movie>();
 
@@ -44,7 +44,7 @@ public class MovieJsonUtility {
 
                 movies[i] = new Movie(id,title,vote_count,video,vote_average,popularity,poster_path,original_lan,original_tit,overview,release_date);
 
-                Log.d("--------- JSON --------",
+                Log.d("--------- MOVIE -------",
                             movies[i].getVoteCount()   +" - "
                                 + movies[i].getId()          +" - "
                                 + movies[i].getVideo()       +" - "
@@ -55,7 +55,8 @@ public class MovieJsonUtility {
                                 + movies[i].getOriginalLan() +" - "
                                 + movies[i].getOriginalTit() +" - "
                                 + movies[i].getOverview()    +" - "
-                                + movies[i].getReleaseDate());
+                                + movies[i].getReleaseDate() +"\n"
+                );
             }
 
             return movies;

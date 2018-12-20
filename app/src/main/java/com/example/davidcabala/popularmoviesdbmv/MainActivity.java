@@ -1,6 +1,7 @@
 package com.example.davidcabala.popularmoviesdbmv;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -20,19 +21,20 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
+import com.example.davidcabala.popularmoviesdbmv.interfaces.OnMoviesAdapterItemClickListener;
 import com.example.davidcabala.popularmoviesdbmv.utilities.MovieJsonUtility;
+import com.google.gson.Gson;
 
-public class MainActivity extends AppCompatActivity implements FetchMovieAsync.AsyncResponse {
+import java.io.Serializable;
+
+public class MainActivity extends AppCompatActivity implements FetchMovieAsync.AsyncResponse, View.OnClickListener {
 
     private RecyclerView mRecyclerView;
     private MoviesAdapter mMoviesAdapter;
-
     private Menu mMenu;
     private int currPage;
-    private String sortBy;
-    private String gsortOrder;
-
-    TextView tvJSON;
+    private Button nextPage;
+    private Button prevPage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,11 +42,12 @@ public class MainActivity extends AppCompatActivity implements FetchMovieAsync.A
         setContentView(R.layout.activity_main);
 
         mRecyclerView= (RecyclerView) findViewById(R.id.movies_recycler_view);
+        currPage  = 1;
+        nextPage = (Button) findViewById(R.id.btn_next);
+        prevPage = (Button) findViewById(R.id.btn_previous);
 
-        tvJSON = findViewById(R.id.json);
-        currPage  = 2;
-        sortBy    = "vote_average";
-        gsortOrder = "desc";
+        nextPage.setOnClickListener(this);
+        prevPage.setOnClickListener(this);
 
 
         mRecyclerView.setHasFixedSize(true);
@@ -54,16 +57,35 @@ public class MainActivity extends AppCompatActivity implements FetchMovieAsync.A
 
         updateMovies();
 
-//        Button crashButton = new Button(this);
-//        crashButton.setText("Crash!");
-//        crashButton.setOnClickListener(new View.OnClickListener() {
-//            public void onClick(View view) {
-//                Crashlytics.getInstance().crash(); // Force a crash
-//            }
-//        });
-//        addContentView(crashButton, new ViewGroup.LayoutParams(
-//                ViewGroup.LayoutParams.MATCH_PARENT,
-//                ViewGroup.LayoutParams.WRAP_CONTENT));
+/*        Button crashButton = new Button(this);
+        crashButton.setText("Crash!");
+        crashButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                Crashlytics.getInstance().crash(); // Force a crash
+            }
+        });
+        addContentView(crashButton, new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT));*/
+    }
+
+    @Override
+    public void onClick(View v) {
+
+        switch ( v.getId() ) {
+            case R.id.btn_next:
+                currPage++;
+                break;
+            case R.id.btn_previous:
+                currPage--;
+                break;
+
+            default:
+        }
+
+        if (currPage < 1) {
+            currPage = 1;
+        } else updateMovies();
     }
 
     public void updateMovies() {
@@ -75,7 +97,7 @@ public class MainActivity extends AppCompatActivity implements FetchMovieAsync.A
             FetchMovieAsync async = new FetchMovieAsync();
             async.delegate = this;
 
-            async.execute(endpoint, sortBy+"."+gsortOrder, String.valueOf(currPage+53));
+            async.execute(endpoint, getSortBy() +"." + getSortOrder(), String.valueOf(currPage));
 
         } else {
             Toast.makeText(this, R.string.error_need_internet, Toast.LENGTH_LONG).show();
@@ -84,30 +106,22 @@ public class MainActivity extends AppCompatActivity implements FetchMovieAsync.A
 
     @Override
     public void processFinish(String json) {
-        Log.v("---------JSON-4--------", json);
+        Log.v("------=== JSON ===-----", json);
 
-        tvJSON.setText("");
-
-        Movie[] movies = new MovieJsonUtility().parseMoviesJson(json);
-
-        for (Movie m : movies) {
-            String s =
-                              m.getVoteCount()   + "\n"
-                            + m.getId()          + "\n"
-                            + m.getVideo()       + "\n"
-                            + m.getVoteAverage() + "\n"
-                            + m.getTitle()       + "\n"
-                            + m.getPopularity()  + "\n"
-                            + m.getPosterPath()  + "\n"
-                            + m.getOriginalLan() + "\n"
-                            + m.getOriginalTit() + "\n"
-                            + m.getOverview()    + "\n"
-                            + m.getReleaseDate() +"\n\n";
-            tvJSON.append(s);
-        }
+        final Movie[] movies = new MovieJsonUtility().parseMoviesJson(json);
 
 
-        mMoviesAdapter = new MoviesAdapter(movies);
+        mMoviesAdapter = new MoviesAdapter(this, movies, new OnMoviesAdapterItemClickListener() {
+            @Override
+            public void OnItemClicked(int pos) {
+                Gson gson = new Gson();
+                String send_movie = gson.toJson(movies[pos]);
+
+                Intent intent = new Intent(MainActivity.this, MovieActivity.class);
+                intent.putExtra("MOVIE_OBJECT", send_movie);
+                MainActivity.this.startActivity(intent);
+            }
+        });
         mRecyclerView.setAdapter(mMoviesAdapter);
     }
 
@@ -120,27 +134,35 @@ public class MainActivity extends AppCompatActivity implements FetchMovieAsync.A
 
         // Add menu items
         mMenu.add(Menu.NONE,
-                3,
+                R.string.popularity,
                 Menu.NONE,
                 null)
                 .setVisible(true)
-                .setIcon(R.mipmap.ic_launcher_foreground)
-                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-
-        mMenu.add(Menu.NONE, // No group
-                1, // ID
-                Menu.NONE, // Sort order: not relevant
-                null) // No text to display
-                .setVisible(false)
-                .setIcon(R.mipmap.tesla)
+                .setIcon(R.drawable.popular_white)
                 .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
         mMenu.add(Menu.NONE,
-                2,
+                R.string.vote_average,
+                Menu.NONE,
+                null)
+                .setVisible(true)
+                .setIcon(R.drawable.average_white)
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+
+        mMenu.add(Menu.NONE, // No group
+                R.string.sort_asc, // ID
+                Menu.NONE, // Sort order: not relevant
+                null) // No text to display
+                .setVisible(false)
+                .setIcon(R.drawable.arr_down)
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+
+        mMenu.add(Menu.NONE,
+                R.string.sort_desc,
                 Menu.NONE,
                 null)
                 .setVisible(false)
-                .setIcon(R.mipmap.ic_launcher)
+                .setIcon(R.drawable.arr_up)
                 .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
 
@@ -151,31 +173,34 @@ public class MainActivity extends AppCompatActivity implements FetchMovieAsync.A
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case 1:
-                updateSharedPrefs("","asc");
-                updateMenu();
-                //getMoviesFromTMDb(getSortMethod());
-                gsortOrder = "asc";
-                updateMovies();
-                return true;
-            case 2:
-                updateSharedPrefs("","desc");
-                updateMenu();
-                //getMoviesFromTMDb(getSortMethod());
-                gsortOrder = "desc";
-                updateMovies();
-                return true;
-            case 3:
-                if (sortBy.equals("vote_average")) {
-                    sortBy = "popularity";
-                } else sortBy = "vote_average";
 
-                updateSharedPrefs(sortBy, gsortOrder);
+        switch (item.getItemId()) {
+            case R.string.popularity:
+                updateSharedPrefs( getString(R.string.popularity), getSortOrder() );
                 updateMenu();
-                //getMoviesFromTMDb(getSortMethod());
+                currPage = 1;
                 updateMovies();
                 return true;
+
+            case R.string.vote_average:
+                updateSharedPrefs( getString(R.string.vote_average), getSortOrder() );
+                updateMenu();
+                currPage = 1;
+                updateMovies();
+                return true;
+
+            case R.string.sort_asc:
+                updateSharedPrefs( getSortBy(), getString(R.string.sort_asc) );
+                updateMenu();
+                updateMovies();
+                return true;
+
+            case R.string.sort_desc:
+                updateSharedPrefs( getSortBy(), getString(R.string.sort_desc) );
+                updateMenu();
+                updateMovies();
+                return true;
+
             default:
         }
 
@@ -187,11 +212,11 @@ public class MainActivity extends AppCompatActivity implements FetchMovieAsync.A
         Log.d("------SORT_ORDER------", sortOrder);
 
         if (sortOrder.equals("asc")) {
-            mMenu.findItem(1).setVisible(false);
-            mMenu.findItem(2).setVisible(true);
+            mMenu.findItem( R.string.sort_asc ).setVisible(false);
+            mMenu.findItem( R.string.sort_desc ).setVisible(true);
         } else {
-            mMenu.findItem(2).setVisible(false);
-            mMenu.findItem(1).setVisible(true);
+            mMenu.findItem( R.string.sort_desc ).setVisible(false);
+            mMenu.findItem( R.string.sort_asc ).setVisible(true);
         }
     }
 
@@ -206,7 +231,7 @@ public class MainActivity extends AppCompatActivity implements FetchMovieAsync.A
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         return prefs.getString("SORT_BY",
-                "desc");
+                "popularity");
     }
 
     private void updateSharedPrefs(String sortBy, String sortOrder) {

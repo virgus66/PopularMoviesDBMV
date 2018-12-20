@@ -60,7 +60,6 @@ public class FetchMovieAsync extends AsyncTask<String, Void, String>{
 
     @Override
     protected void onPostExecute(String s) {
-        //Log.v("---------JSON-2--------", s);
         delegate.processFinish(s);
     }
 }

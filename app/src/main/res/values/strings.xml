@@ -4,4 +4,9 @@
     <string name="error_need_internet">You have no connection with internet.</string>
 
     <string name="TMDB_POSTER_BASE">https://image.tmdb.org/t/p/w185</string>
+
+    <string name="sort_asc">asc</string>
+    <string name="sort_desc">desc</string>
+    <string name="popularity">popularity</string>
+    <string name="vote_average">vote_average</string>
 </resources>
