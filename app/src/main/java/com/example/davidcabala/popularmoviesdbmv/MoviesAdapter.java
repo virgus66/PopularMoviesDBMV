@@ -10,16 +10,23 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.davidcabala.popularmoviesdbmv.interfaces.OnBottomReachedListener;
 import com.example.davidcabala.popularmoviesdbmv.interfaces.OnMoviesAdapterItemClickListener;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
+
 public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesViewHolder>{
     private Context ctx;
-    private Movie[] movies;
+    private ArrayList<Movie> movies;
 
     public OnMoviesAdapterItemClickListener adapterClickListener;
+    public OnBottomReachedListener onBottomReachedListener;
 
-    public MoviesAdapter(Context ctx, Movie[] movies, OnMoviesAdapterItemClickListener adapterClickListener) {
+
+
+
+    public MoviesAdapter(Context ctx, ArrayList<Movie>movies, OnMoviesAdapterItemClickListener adapterClickListener) {
         this.ctx    = ctx;
         this.movies = movies;
         this.adapterClickListener = adapterClickListener;
@@ -36,9 +43,9 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesView
 
     @Override
     public void onBindViewHolder(@NonNull MoviesViewHolder holder, final int position) {
-        holder.mTitle.setText( movies[ position ].getTitle() );
+        holder.mTitle.setText( movies.get( position ).getTitle() );
         Picasso.get()
-                .load( movies[ position ].getPosterPath() )
+                .load( movies.get( position ).getPosterPath() )
                 .placeholder( R.mipmap.placeholder )
                 .into(holder.mMovieImage);
 
@@ -49,11 +56,15 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesView
                 adapterClickListener.OnItemClicked( position);
             }
         });
+
+        if (position == movies.size()-1) {
+            onBottomReachedListener.OnBottomReached(position);
+        }
     }
 
     @Override
     public int getItemCount() {
-        return movies.length;
+        return movies.size();
     }
 
     // custom viewholder
@@ -67,5 +78,9 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesView
             mTitle      = (TextView) v.findViewById(R.id.movie_title);
             mMovieImage = (ImageView) v.findViewById(R.id.movie_item_poster_image);
         }
+    }
+
+    public void setOnBottomReachedListener(OnBottomReachedListener onBottomReachedListener) {
+        this.onBottomReachedListener = onBottomReachedListener;
     }
 }

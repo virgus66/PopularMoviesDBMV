@@ -13,7 +13,7 @@ import java.util.List;
 
 public class MovieJsonUtility {
 
-    public static Movie[] parseMoviesJson(String json) {
+    public static ArrayList<Movie> parseMoviesJson(String json) {
 
 
         try {
@@ -22,7 +22,7 @@ public class MovieJsonUtility {
 
 
             Log.d("------- JSON LNG ------", resultsArr.length()+"");
-            Movie[] movies = new Movie[ resultsArr.length() ];
+            ArrayList<Movie> movies = new ArrayList <Movie>();
             //List<Movie> movies = new ArrayList<Movie>();
 
 
@@ -42,20 +42,20 @@ public class MovieJsonUtility {
                 String overview     = movie.getString("overview");
                 String release_date = movie.getString("release_date");
 
-                movies[i] = new Movie(id,title,vote_count,video,vote_average,popularity,poster_path,original_lan,original_tit,overview,release_date);
+                movies.add( new Movie(id,title,vote_count,video,vote_average,popularity,poster_path,original_lan,original_tit,overview,release_date) );
 
                 Log.d("--------- MOVIE -------",
-                            movies[i].getVoteCount()   +" - "
-                                + movies[i].getId()          +" - "
-                                + movies[i].getVideo()       +" - "
-                                + movies[i].getVoteAverage() +" - "
-                                + movies[i].getTitle()       +" - "
-                                + movies[i].getPopularity()  +" - "
-                                + movies[i].getPosterPath()  +" - "
-                                + movies[i].getOriginalLan() +" - "
-                                + movies[i].getOriginalTit() +" - "
-                                + movies[i].getOverview()    +" - "
-                                + movies[i].getReleaseDate() +"\n"
+                            movies.get(i).getVoteCount()   +" - "
+                                + movies.get(i).getId()          +" - "
+                                + movies.get(i).getVideo()       +" - "
+                                + movies.get(i).getVoteAverage() +" - "
+                                + movies.get(i).getTitle()       +" - "
+                                + movies.get(i).getPopularity()  +" - "
+                                + movies.get(i).getPosterPath()  +" - "
+                                + movies.get(i).getOriginalLan() +" - "
+                                + movies.get(i).getOriginalTit() +" - "
+                                + movies.get(i).getOverview()    +" - "
+                                + movies.get(i).getReleaseDate() +"\n"
                 );
             }
 

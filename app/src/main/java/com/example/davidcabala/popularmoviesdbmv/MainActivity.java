@@ -9,6 +9,7 @@ import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -21,27 +22,30 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
+import com.example.davidcabala.popularmoviesdbmv.interfaces.OnBottomReachedListener;
 import com.example.davidcabala.popularmoviesdbmv.interfaces.OnMoviesAdapterItemClickListener;
 import com.example.davidcabala.popularmoviesdbmv.utilities.MovieJsonUtility;
 import com.google.gson.Gson;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements FetchMovieAsync.AsyncResponse, View.OnClickListener {
 
     private RecyclerView mRecyclerView;
+    private GridLayoutManager gridLayoutManager;
     private MoviesAdapter mMoviesAdapter;
     private Menu mMenu;
     private int currPage;
     private Button nextPage;
     private Button prevPage;
+    private ArrayList<Movie> movies = new ArrayList<Movie>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mRecyclerView= (RecyclerView) findViewById(R.id.movies_recycler_view);
         currPage  = 1;
         nextPage = (Button) findViewById(R.id.btn_next);
         prevPage = (Button) findViewById(R.id.btn_previous);
@@ -49,11 +53,13 @@ public class MainActivity extends AppCompatActivity implements FetchMovieAsync.A
         nextPage.setOnClickListener(this);
         prevPage.setOnClickListener(this);
 
-
+        mRecyclerView= (RecyclerView) findViewById(R.id.movies_recycler_view);
         mRecyclerView.setHasFixedSize(true);
-        LinearLayoutManager layoutManager
+/*        LinearLayoutManager layoutManager
                 = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-        mRecyclerView.setLayoutManager(layoutManager);
+        mRecyclerView.setLayoutManager(layoutManager);*/
+        gridLayoutManager = new GridLayoutManager(MainActivity.this,3);
+        mRecyclerView.setLayoutManager(gridLayoutManager);
 
         updateMovies();
 
@@ -108,21 +114,38 @@ public class MainActivity extends AppCompatActivity implements FetchMovieAsync.A
     public void processFinish(String json) {
         Log.v("------=== JSON ===-----", json);
 
-        final Movie[] movies = new MovieJsonUtility().parseMoviesJson(json);
+        if ( movies.size() == 0 ) {
+            movies = new MovieJsonUtility().parseMoviesJson(json);
+            mMoviesAdapter = new MoviesAdapter(this, movies, new OnMoviesAdapterItemClickListener() {
+                @Override
+                public void OnItemClicked(int pos) {
+                    Gson gson = new Gson();
+                    String send_movie = gson.toJson(movies.get(pos));
+
+                    Intent intent = new Intent(MainActivity.this, MovieActivity.class);
+                    intent.putExtra("MOVIE_OBJECT", send_movie);
+                    MainActivity.this.startActivity(intent);
+                }
+            });
+
+            mRecyclerView.setAdapter(mMoviesAdapter);
+            mMoviesAdapter.setOnBottomReachedListener(new OnBottomReachedListener() {
+                @Override
+                public void OnBottomReached(int position) {
+                    currPage++;
+                    updateMovies();
+                }
+            });
+        }
+        else
+        {
+            ArrayList<Movie> more_movies;
+            more_movies = new MovieJsonUtility().parseMoviesJson(json);
+            movies.addAll(more_movies);
+            mMoviesAdapter.notifyItemInserted( movies.size() - 1 );
+        }
 
 
-        mMoviesAdapter = new MoviesAdapter(this, movies, new OnMoviesAdapterItemClickListener() {
-            @Override
-            public void OnItemClicked(int pos) {
-                Gson gson = new Gson();
-                String send_movie = gson.toJson(movies[pos]);
-
-                Intent intent = new Intent(MainActivity.this, MovieActivity.class);
-                intent.putExtra("MOVIE_OBJECT", send_movie);
-                MainActivity.this.startActivity(intent);
-            }
-        });
-        mRecyclerView.setAdapter(mMoviesAdapter);
     }
 
     @Override
@@ -165,8 +188,6 @@ public class MainActivity extends AppCompatActivity implements FetchMovieAsync.A
                 .setIcon(R.drawable.arr_up)
                 .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
-
-        // Update menu to show relevant items
         updateMenu();
         return true;
     }
@@ -179,6 +200,7 @@ public class MainActivity extends AppCompatActivity implements FetchMovieAsync.A
                 updateSharedPrefs( getString(R.string.popularity), getSortOrder() );
                 updateMenu();
                 currPage = 1;
+                movies.clear();
                 updateMovies();
                 return true;
 
@@ -186,18 +208,21 @@ public class MainActivity extends AppCompatActivity implements FetchMovieAsync.A
                 updateSharedPrefs( getString(R.string.vote_average), getSortOrder() );
                 updateMenu();
                 currPage = 1;
+                movies.clear();
                 updateMovies();
                 return true;
 
             case R.string.sort_asc:
                 updateSharedPrefs( getSortBy(), getString(R.string.sort_asc) );
                 updateMenu();
+                movies.clear();
                 updateMovies();
                 return true;
 
             case R.string.sort_desc:
                 updateSharedPrefs( getSortBy(), getString(R.string.sort_desc) );
                 updateMenu();
+                movies.clear();
                 updateMovies();
                 return true;
 
@@ -226,6 +251,7 @@ public class MainActivity extends AppCompatActivity implements FetchMovieAsync.A
         return prefs.getString("SORT_ORDER",
                 "desc");
     }
+
 
     private String getSortBy() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
