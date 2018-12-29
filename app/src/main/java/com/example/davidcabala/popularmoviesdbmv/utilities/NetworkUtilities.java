@@ -17,7 +17,7 @@ public class NetworkUtilities {
     private static final String moviesUrl = "https://api.themoviedb.org/3";
     final static String API_KEY_PARAM = "api_key";
     final static String SORT_BY_PARAM = "sort_by";
-    final static String API_KEY = "6b6d667ed3e438074ddf460ffe25a8ca";
+    final static String API_KEY = "6b6d667ed3e438074ddf460ffe25a8ca"; // change the key to your own
 
     public static URL buildUrl(String endpoint, String sortBy, String page) {
 
