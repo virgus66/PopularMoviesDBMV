@@ -14,20 +14,4 @@
         android:scrollbars="vertical">
     </android.support.v7.widget.RecyclerView>
 
-    <Button
-        android:id="@+id/btn_previous"
-        android:layout_width="100dp"
-        android:layout_height="50dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignLeft="@+id/movies_recycler_view"
-        android:text="Prev" />
-
-    <Button
-        android:id="@+id/btn_next"
-        android:layout_width="100dp"
-        android:layout_height="50dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignRight="@+id/movies_recycler_view"
-        android:text="Next" />
-
 </RelativeLayout>

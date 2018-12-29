@@ -37,9 +37,8 @@ public class MainActivity extends AppCompatActivity implements FetchMovieAsync.A
     private MoviesAdapter mMoviesAdapter;
     private Menu mMenu;
     private int currPage;
-    private Button nextPage;
-    private Button prevPage;
     private ArrayList<Movie> movies = new ArrayList<Movie>();
+    String endpoint = "/movie/popular";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,11 +46,6 @@ public class MainActivity extends AppCompatActivity implements FetchMovieAsync.A
         setContentView(R.layout.activity_main);
 
         currPage  = 1;
-        nextPage = (Button) findViewById(R.id.btn_next);
-        prevPage = (Button) findViewById(R.id.btn_previous);
-
-        nextPage.setOnClickListener(this);
-        prevPage.setOnClickListener(this);
 
         mRecyclerView= (RecyclerView) findViewById(R.id.movies_recycler_view);
         mRecyclerView.setHasFixedSize(true);
@@ -62,30 +56,12 @@ public class MainActivity extends AppCompatActivity implements FetchMovieAsync.A
         mRecyclerView.setLayoutManager(gridLayoutManager);
 
         updateMovies();
-
-/*        Button crashButton = new Button(this);
-        crashButton.setText("Crash!");
-        crashButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                Crashlytics.getInstance().crash(); // Force a crash
-            }
-        });
-        addContentView(crashButton, new ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT));*/
     }
 
     @Override
     public void onClick(View v) {
 
         switch ( v.getId() ) {
-            case R.id.btn_next:
-                currPage++;
-                break;
-            case R.id.btn_previous:
-                currPage--;
-                break;
-
             default:
         }
 
@@ -96,14 +72,10 @@ public class MainActivity extends AppCompatActivity implements FetchMovieAsync.A
 
     public void updateMovies() {
         if (isNetworkAvailable()) {
-            String endpoint = "/discover/movie";
-//            String endpoint = "/movie/top_rated";
-//            String endpoint2 = "/movie/popular";
 
             FetchMovieAsync async = new FetchMovieAsync();
             async.delegate = this;
-
-            async.execute(endpoint, getSortBy() +"." + getSortOrder(), String.valueOf(currPage));
+            async.execute(endpoint, String.valueOf(currPage));
 
         } else {
             Toast.makeText(this, R.string.error_need_internet, Toast.LENGTH_LONG).show();
@@ -154,6 +126,7 @@ public class MainActivity extends AppCompatActivity implements FetchMovieAsync.A
 
         // Make menu items accessible
         mMenu = menu;
+        updateSharedPrefs( getString(R.string.popularity), getSortOrder() );
 
         // Add menu items
         mMenu.add(Menu.NONE,
@@ -168,27 +141,10 @@ public class MainActivity extends AppCompatActivity implements FetchMovieAsync.A
                 R.string.vote_average,
                 Menu.NONE,
                 null)
-                .setVisible(true)
+                .setVisible(false)
                 .setIcon(R.drawable.average_white)
                 .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
-        mMenu.add(Menu.NONE, // No group
-                R.string.sort_asc, // ID
-                Menu.NONE, // Sort order: not relevant
-                null) // No text to display
-                .setVisible(false)
-                .setIcon(R.drawable.arr_down)
-                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-
-        mMenu.add(Menu.NONE,
-                R.string.sort_desc,
-                Menu.NONE,
-                null)
-                .setVisible(false)
-                .setIcon(R.drawable.arr_up)
-                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-
-        updateMenu();
         return true;
     }
 
@@ -197,7 +153,7 @@ public class MainActivity extends AppCompatActivity implements FetchMovieAsync.A
 
         switch (item.getItemId()) {
             case R.string.popularity:
-                updateSharedPrefs( getString(R.string.popularity), getSortOrder() );
+                endpoint = "/movie/top_rated";
                 updateMenu();
                 currPage = 1;
                 movies.clear();
@@ -205,23 +161,9 @@ public class MainActivity extends AppCompatActivity implements FetchMovieAsync.A
                 return true;
 
             case R.string.vote_average:
-                updateSharedPrefs( getString(R.string.vote_average), getSortOrder() );
+                endpoint = "/movie/popular";
                 updateMenu();
                 currPage = 1;
-                movies.clear();
-                updateMovies();
-                return true;
-
-            case R.string.sort_asc:
-                updateSharedPrefs( getSortBy(), getString(R.string.sort_asc) );
-                updateMenu();
-                movies.clear();
-                updateMovies();
-                return true;
-
-            case R.string.sort_desc:
-                updateSharedPrefs( getSortBy(), getString(R.string.sort_desc) );
-                updateMenu();
                 movies.clear();
                 updateMovies();
                 return true;
@@ -233,15 +175,17 @@ public class MainActivity extends AppCompatActivity implements FetchMovieAsync.A
     }
 
     private void updateMenu() {
-        String sortOrder = getSortOrder();
-        Log.d("------SORT_ORDER------", sortOrder);
+        String sortBy = getSortBy();
+        Log.d("------SORT_BY------", sortBy);
 
-        if (sortOrder.equals("asc")) {
-            mMenu.findItem( R.string.sort_asc ).setVisible(false);
-            mMenu.findItem( R.string.sort_desc ).setVisible(true);
+        if (sortBy.equals( getString(R.string.popularity) )) {
+            mMenu.findItem( R.string.popularity ).setVisible(false);
+            mMenu.findItem( R.string.vote_average ).setVisible(true);
+            updateSharedPrefs( getString(R.string.vote_average), getSortOrder() );
         } else {
-            mMenu.findItem( R.string.sort_desc ).setVisible(false);
-            mMenu.findItem( R.string.sort_asc ).setVisible(true);
+            mMenu.findItem( R.string.popularity ).setVisible(true);
+            mMenu.findItem( R.string.vote_average ).setVisible(false);
+            updateSharedPrefs( getString(R.string.popularity), getSortOrder() );
         }
     }
 

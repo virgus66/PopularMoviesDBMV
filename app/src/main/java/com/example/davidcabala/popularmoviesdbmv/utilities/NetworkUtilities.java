@@ -17,13 +17,12 @@ public class NetworkUtilities {
     private static final String moviesUrl = "https://api.themoviedb.org/3";
     final static String API_KEY_PARAM = "api_key";
     final static String SORT_BY_PARAM = "sort_by";
-    final static String API_KEY = "6b6d667ed3e438074ddf460ffe25a8ca"; // change the key to your own
+    final static String API_KEY = ""; // change the key to your own
 
-    public static URL buildUrl(String endpoint, String sortBy, String page) {
+    public static URL buildUrl(String endpoint, String page) {
 
         Uri builtUri = Uri.parse(moviesUrl + endpoint).buildUpon()
                 .appendQueryParameter(API_KEY_PARAM, API_KEY)
-                .appendQueryParameter(SORT_BY_PARAM, sortBy)
                 .appendQueryParameter("page", page)
                 .build();
 

@@ -19,7 +19,7 @@ public class FetchMovieAsync extends AsyncTask<String, Void, String>{
 
 
 
-    // create interface to catch data in MainActivity
+    // interface to catch data in MainActivity
     public interface AsyncResponse {
         void processFinish(String output);
     }
@@ -32,18 +32,12 @@ public class FetchMovieAsync extends AsyncTask<String, Void, String>{
 
     @Override
     protected String doInBackground(String... params) {
-        URL movieRequestUrl = NetworkUtilities.buildUrl(params[0], params[1], params[2]);
+        URL movieRequestUrl = NetworkUtilities.buildUrl(params[0], params[1]);
 
         try {
             Log.d("-----------URL---------", movieRequestUrl.toString());
             String jsonMovieResponse = NetworkUtilities
                     .getResponseFromHttpUrl(movieRequestUrl);
-
-
-//            String[] simpleJsonMovieData = OpenWeatherJsonUtils
-//                    .getSimpleWeatherStringsFromJson(MainActivity.this, jsonMovieResponse);
-//            return simpleJsonMovieData;
-
 
             return jsonMovieResponse;
 
