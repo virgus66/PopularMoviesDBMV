@@ -9,34 +9,110 @@
 
     <ImageView
         android:id="@+id/movie_activity_imageView"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_width="131dp"
+        android:layout_height="178dp"
+        android:paddingTop="8dp"
         tools:layout_editor_absoluteX="0dp"
         tools:layout_editor_absoluteY="0dp" />
 
     <TextView
         android:id="@+id/movie_activity_title"
-        android:layout_width="wrap_content"
+        android:layout_width="190dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="8dp"
+        android:layout_weight="0"
+        android:ellipsize="none"
+        android:maxLines="3"
+        android:scrollHorizontally="false"
         android:text="Title"
         android:textSize="20dp"
+        app:layout_constraintStart_toEndOf="@+id/movie_activity_imageView"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="20dp"
+        android:text="Released on:"
+        android:textSize="10dp"
+        app:layout_constraintStart_toEndOf="@+id/movie_activity_imageView"
+        app:layout_constraintTop_toBottomOf="@+id/movie_activity_title" />
+
+    <TextView
+        android:id="@+id/movie_activity_release"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="1dp"
+        android:text="1900/01/01"
+        android:textSize="10dp"
+        app:layout_constraintStart_toEndOf="@+id/movie_activity_imageView"
+        app:layout_constraintTop_toBottomOf="@+id/textView2" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="12dp"
+        android:textSize="10dp"
+        android:text="Total votes:"
+        app:layout_constraintStart_toEndOf="@+id/movie_activity_imageView"
+        app:layout_constraintTop_toBottomOf="@+id/movie_activity_release" />
+
+    <TextView
+        android:id="@+id/movie_activity_votes_total"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="1dp"
+        android:text="1519"
+        android:textSize="12dp"
+        app:layout_constraintStart_toEndOf="@+id/movie_activity_imageView"
+        app:layout_constraintTop_toBottomOf="@+id/textView3" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="20dp"
+        android:text="Average:"
+        android:textSize="10dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/movie_activity_imageView" />
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/movie_activity_votes_av"
+        android:layout_width="65dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/rounded_corner"
+        android:gravity="center"
+        android:padding="8dp"
+        android:text="5.1"
+        android:textColor="@color/colorText"
+        android:textSize="35dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
 
     <TextView
         android:id="@+id/movie_activity_content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="8dp"
+        android:padding="8dp"
         android:text="Content / description"
         android:textSize="12dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/movie_activity_title" />
+        app:layout_constraintTop_toBottomOf="@+id/movie_activity_imageView" />
+
+
 </android.support.constraint.ConstraintLayout>
